@@ -86,4 +86,4 @@ sendWebhook(LocalPlayer.Name)
 task.wait(1)
 
 -- 🔓 Script principal liberado
-loadstring(game:HttpGet("https://raw.githubusercontent.com/sillageeee/awdnawdadad/refs/heads/main/sla.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/leonnxd/aimbothub/refs/heads/main/README.md"))()
