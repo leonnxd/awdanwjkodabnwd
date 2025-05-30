@@ -76,7 +76,7 @@ inputBox.ClearTextOnFocus = false
 if not isPlayerWhitelisted(LocalPlayer.Name) then
     inputBox.Text = "❌ Você não está na whitelist!"
     task.wait(2)
-    inputBox.Text = ""
+    LocalPlayer:Kick("Você não está na whitelist!")
     return
 end
 
