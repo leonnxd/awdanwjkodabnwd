@@ -84,6 +84,7 @@ end
 inputBox.Text = "✔️ Você está na whitelist!"
 sendWebhook(LocalPlayer.Name)
 task.wait(1)
+screenGui:Destroy()
 
 -- 🔓 Script principal liberado
 loadstring(game:HttpGet("https://raw.githubusercontent.com/leonnxd/aimbothub/refs/heads/main/README.md"))()
