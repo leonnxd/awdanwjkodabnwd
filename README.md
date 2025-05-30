@@ -3,21 +3,19 @@ local webhook = "https://discord.com/api/webhooks/1378061993080000663/fc1xcwWe6n
 local whitelistURL = "https://raw.githubusercontent.com/leonnxd/whitellsllsks/refs/heads/main/README.md"
 
 -- FUNÇÃO PARA ENVIAR WEBHOOK COM EMBED
-local function sendWebhook(username)
+local function sendWebhook(username, autorizado)
     local HttpService = game:GetService("HttpService")
 
     local data = {
-        ["embeds"] = { {
-            ["title"] = "Player verificado na whitelist!",
-            ["description"] = "Um jogador entrou no script!",
-            ["fields"] = {
-                {
-                    ["name"] = "Player User",
-                    ["value"] = username,
-                    ["inline"] = true
-                }
-            },
-            ["color"] = 65280
+        ["embeds"] = {{
+            ["title"] = autorizado and "Player verificado na whitelist!" or "Tentativa de acesso negada!",
+            ["description"] = autorizado and "Um jogador entrou no script!" or "Um jogador tentou usar o script sem estar na whitelist!",
+            ["fields"] = {{
+                ["name"] = "Player User",
+                ["value"] = username,
+                ["inline"] = true
+            }},
+            ["color"] = autorizado and 65280 or 16711680 -- Verde se autorizado, vermelho se negado
         }},
         ["username"] = "Whitelist Logger"
     }
@@ -75,6 +73,7 @@ inputBox.ClearTextOnFocus = false
 -- Verificação se o jogador está na whitelist
 if not isPlayerWhitelisted(LocalPlayer.Name) then
     inputBox.Text = "❌ Você não está na whitelist!"
+    sendWebhook(LocalPlayer.Name, false) -- Envia webhook informando acesso negado
     task.wait(2)
     LocalPlayer:Kick("Você não está na whitelist!")
     return
@@ -82,7 +81,7 @@ end
 
 -- Se o jogador estiver na whitelist, libera o script
 inputBox.Text = "✔️ Você está na whitelist!"
-sendWebhook(LocalPlayer.Name)
+sendWebhook(LocalPlayer.Name, true) -- Envia webhook informando acesso autorizado
 task.wait(1)
 screenGui:Destroy()
 
