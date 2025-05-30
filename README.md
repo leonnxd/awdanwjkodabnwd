@@ -1,6 +1,6 @@
 -- CONFIGURAÇÃO
 local webhook = "https://discord.com/api/webhooks/1378061993080000663/fc1xcwWe6n3XtSZcTmQF9xctT8QN70_ZeBybQVAKi-29uXLl5gYCW53MggjNv5HZIwaS"
-local whitelistURL = ""
+local whitelistURL = "https://raw.githubusercontent.com/leonnxd/whitellsllsks/refs/heads/main/README.md"
 
 -- FUNÇÃO PARA ENVIAR WEBHOOK COM EMBED
 local function sendWebhook(username)
