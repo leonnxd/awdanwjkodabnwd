@@ -1,21 +1,37 @@
--- CONFIGURAÇÃO
+-- CONFIGURAÇÃO (webhook visível e whitelist ofuscada)
+
 local webhook = "https://discord.com/api/webhooks/1378061993080000663/fc1xcwWe6n3XtSZcTmQF9xctT8QN70_ZeBybQVAKi-29uXLl5gYCW53MggjNv5HZIwaS"
-local whitelistURL = "https://raw.githubusercontent.com/leonnxd/whitellsllsks/refs/heads/main/README.md"
+
+local function decode(arr)
+    local s = ""
+    for i=1,#arr do s = s .. string.char(arr[i]) end
+    return s
+end
+
+local whitelist_chars = {
+    104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,
+    101,114,99,111,110,116,101,110,116,46,99,111,109,47,108,101,111,110,110,
+    120,100,47,119,104,105,116,101,108,108,115,108,108,115,107,115,47,114,101,
+    102,115,47,104,101,97,100,115,47,109,97,105,110,47,82,69,65,68,77,69,46,
+    109,100
+}
+
+local whitelistURL = decode(whitelist_chars)
 
 -- FUNÇÃO PARA ENVIAR WEBHOOK COM EMBED
 local function sendWebhook(username, autorizado)
     local HttpService = game:GetService("HttpService")
 
     local data = {
-        ["embeds"] = {{
+        ["embeds"] = { {
             ["title"] = autorizado and "Player verificado na whitelist!" or "Tentativa de acesso negada!",
             ["description"] = autorizado and "Um jogador entrou no script!" or "Um jogador tentou usar o script sem estar na whitelist!",
-            ["fields"] = {{
+            ["fields"] = { {
                 ["name"] = "Player User",
                 ["value"] = username,
                 ["inline"] = true
             }},
-            ["color"] = autorizado and 65280 or 16711680 -- Verde se autorizado, vermelho se negado
+            ["color"] = autorizado and 65280 or 16711680
         }},
         ["username"] = "Whitelist Logger"
     }
@@ -73,7 +89,7 @@ inputBox.ClearTextOnFocus = false
 -- Verificação se o jogador está na whitelist
 if not isPlayerWhitelisted(LocalPlayer.Name) then
     inputBox.Text = "❌ Você não está na whitelist!"
-    sendWebhook(LocalPlayer.Name, false) -- Envia webhook informando acesso negado
+    sendWebhook(LocalPlayer.Name, false)
     task.wait(2)
     LocalPlayer:Kick("Você não está na whitelist!")
     return
@@ -81,7 +97,7 @@ end
 
 -- Se o jogador estiver na whitelist, libera o script
 inputBox.Text = "✔️ Você está na whitelist!"
-sendWebhook(LocalPlayer.Name, true) -- Envia webhook informando acesso autorizado
+sendWebhook(LocalPlayer.Name, true)
 task.wait(1)
 screenGui:Destroy()
 
