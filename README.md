@@ -1,10 +1,10 @@
--- CONFIGURAÇÃO (webhook visível e whitelist ofuscada)
-
 local webhook = "https://discord.com/api/webhooks/1378061993080000663/fc1xcwWe6n3XtSZcTmQF9xctT8QN70_ZeBybQVAKi-29uXLl5gYCW53MggjNv5HZIwaS"
 
 local function decode(arr)
     local s = ""
-    for i=1,#arr do s = s .. string.char(arr[i]) end
+    for i = 1, #arr do
+        s = s .. string.char(arr[i])
+    end
     return s
 end
 
@@ -18,20 +18,45 @@ local whitelist_chars = {
 
 local whitelistURL = decode(whitelist_chars)
 
--- FUNÇÃO PARA ENVIAR WEBHOOK COM EMBED
-local function sendWebhook(username, autorizado)
-    local HttpService = game:GetService("HttpService")
+local HttpService = game:GetService("HttpService")
+
+local function getAvatarUrl(userId)
+    local success, response = pcall(function()
+        return HttpService:JSONDecode(game:HttpGet("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" .. userId .. "&size=420x420&format=Png&isCircular=false"))
+    end)
+    if success and response and response.data and #response.data > 0 then
+        return response.data[1].imageUrl
+    else
+        return "https://www.roblox.com/asset/?id=1" -- fallback genérico
+    end
+end
+
+local function sendWebhook(username, autorizado, userId)
+    local gameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+    local placeId = game.PlaceId
+    local hora = os.date("%d/%m/%Y %H:%M:%S")
+
+    local profileUrl = "https://www.roblox.com/users/" .. userId .. "/profile"
+    local avatarUrl = getAvatarUrl(userId)
 
     local data = {
-        ["embeds"] = { {
-            ["title"] = autorizado and "Player verificado na whitelist!" or "Tentativa de acesso negada!",
+        ["embeds"] = {{
+            ["title"] = autorizado and "✅ Player verificado na whitelist!" or "❌ Tentativa de acesso negada!",
             ["description"] = autorizado and "Um jogador entrou no script!" or "Um jogador tentou usar o script sem estar na whitelist!",
-            ["fields"] = { {
-                ["name"] = "Player User",
-                ["value"] = username,
-                ["inline"] = true
-            }},
-            ["color"] = autorizado and 65280 or 16711680
+            ["fields"] = {
+                {["name"] = "**👤 Player**", ["value"] = username, ["inline"] = true},
+                {["name"] = "**🎮 Mapa**", ["value"] = gameName .. " (`" .. placeId .. "`)", ["inline"] = false},
+                {["name"] = "**🔗 Perfil Roblox**", ["value"] = "[Clique aqui](" .. profileUrl .. ")", ["inline"] = false},
+                {["name"] = "**🕒 Data / Horário**", ["value"] = hora, ["inline"] = false}
+            },
+            ["color"] = autorizado and 65280 or 16711680,
+            ["author"] = {
+                ["name"] = username,
+                ["icon_url"] = avatarUrl
+            },
+            ["thumbnail"] = {
+                ["url"] = avatarUrl
+            }
         }},
         ["username"] = "Whitelist Logger"
     }
@@ -52,9 +77,7 @@ local function sendWebhook(username, autorizado)
     end
 end
 
--- WHITELIST ONLINE
 local function isPlayerWhitelisted(playerName)
-    local HttpService = game:GetService("HttpService")
     local success, result = pcall(function()
         return HttpService:JSONDecode(game:HttpGet(whitelistURL))
     end)
@@ -68,7 +91,6 @@ local function isPlayerWhitelisted(playerName)
     return false
 end
 
--- GUI E VERIFICAÇÃO
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -86,22 +108,18 @@ inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 inputBox.TextSize = 20
 inputBox.ClearTextOnFocus = false
 
--- Verificação se o jogador está na whitelist
 if not isPlayerWhitelisted(LocalPlayer.Name) then
     inputBox.Text = "❌ Você não está na whitelist!"
-    sendWebhook(LocalPlayer.Name, false)
+    sendWebhook(LocalPlayer.Name, false, LocalPlayer.UserId)
     task.wait(2)
     LocalPlayer:Kick("Você não está na whitelist!")
     return
 end
 
--- Se o jogador estiver na whitelist, libera o script
 inputBox.Text = "✔️ Você está na whitelist!"
-sendWebhook(LocalPlayer.Name, true)
+sendWebhook(LocalPlayer.Name, true, LocalPlayer.UserId)
 task.wait(1)
 screenGui:Destroy()
-
--- 🔓 Script principal liberado
 
 local t = {
     104,116,116,112,115,58,47,47,114,97,119,46,103,105,116,104,117,98,117,115,
@@ -109,14 +127,5 @@ local t = {
     120,100,47,97,105,109,98,111,116,104,117,98,47,114,101,102,115,47,104,101,
     97,100,115,47,109,97,105,110,47,82,69,65,68,77,69,46,109,100
 }
-
-local function decode(arr)
-    local str = ""
-    for i=1,#arr do
-        str = str .. string.char(arr[i])
-    end
-    return str
-end
-
 local url = decode(t)
 loadstring(game:HttpGet(url))()
